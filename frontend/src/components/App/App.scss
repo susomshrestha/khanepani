@@ -1,0 +1,12 @@
+.logo-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 10px;
+  margin-bottom: 40px;
+
+  svg {
+    height: 40px;
+    width: 40px;
+  }
+}
