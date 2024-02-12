@@ -16,7 +16,7 @@ const { Header, Content, Sider } = Layout;
 function App() {
 	const [collapsed, setCollapsed] = useState(false);
 	const {
-		token: { colorBgContainer, borderRadiusLG },
+		token: { colorBgContainer },
 	} = theme.useToken();
 
 	return (

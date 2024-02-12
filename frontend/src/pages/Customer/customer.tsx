@@ -1,26 +1,54 @@
-import { Table, Space, Tag, TableProps } from 'antd';
+import { Table, Space, TableProps, Button, Modal, Form, Input, DatePicker, Popconfirm } from 'antd';
 import Search, { SearchProps } from 'antd/es/input/Search';
 import { Breadcrumb } from 'antd';
+import {
+	createCustomer,
+	deleteCustomer,
+	getAllCustomers,
+	updateCustomer,
+} from '../../services/customer/customer.service';
+import CustomerModel from '../../models/customer';
+import { PlusOutlined } from '@ant-design/icons';
+import './customer.scss';
+import { useEffect, useReducer } from 'react';
 
+// Define the shape of the state used by the component
+interface State {
+	editData: CustomerModel | null; // Data of the customer being edited
+	isModalOpen: boolean; // Whether the modal is open or not
+	customers: CustomerModel[]; // Array of customers
+}
 
-export default function Customer () {
+// Define the Customer component
+export default function Customer() {
+	// Use useReducer hook to manage component state
+	const [state, setState] = useReducer(
+		(state: State, newState: Partial<State>) => ({
+			...state,
+			...newState,
+		}),
+		{
+			editData: null,
+			isModalOpen: false,
+			customers: [],
+		}
+	);
+	const [form] = Form.useForm(); // Initialize form for modal
 
-  const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+	// Search callback function
+	const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
 
-	interface DataType {
-		key: string;
-		name: string;
-		age: number;
-		dharaNo: string;
-		tags: string[];
-	}
-	
-	const columns: TableProps<DataType>['columns'] = [
+	// Define columns for the Ant Design Table component
+	const columns: TableProps<CustomerModel>['columns'] = [
+		{
+			title: 'Dhara No',
+			dataIndex: 'dharaNo',
+			key: 'dharaNo',
+		},
 		{
 			title: 'Name',
 			dataIndex: 'name',
 			key: 'name',
-			render: (text) => <a>{text}</a>,
 		},
 		{
 			title: 'Age',
@@ -28,66 +56,76 @@ export default function Customer () {
 			key: 'age',
 		},
 		{
-			title: 'Dhara No',
-			dataIndex: 'dharaNo',
-			key: 'dharaNo',
-		},
-		{
-			title: 'Tags',
-			key: 'tags',
-			dataIndex: 'tags',
-			render: (_, { tags }) => (
-				<>
-					{tags.map((tag) => {
-						let color = tag.length > 5 ? 'geekblue' : 'green';
-						if (tag === 'loser') {
-							color = 'volcano';
-						}
-						return (
-							<Tag color={color} key={tag}>
-								{tag.toUpperCase()}
-							</Tag>
-						);
-					})}
-				</>
-			),
+			title: 'Phone',
+			dataIndex: 'phone',
+			key: 'phone',
 		},
 		{
 			title: 'Action',
 			key: 'action',
 			render: (_, record) => (
 				<Space size="middle">
-					<a>Invite {record.name}</a>
-					<a>Delete</a>
+					<Button onClick={(_) => showModal(record)}>Edit</Button>
+					<Popconfirm
+						title="Delete the task"
+						description="Are you sure to delete this task?"
+						onConfirm={(_) => deleteConfirm(record)}
+						okText="Yes"
+						cancelText="No">
+						<Button danger>Delete</Button>
+					</Popconfirm>
 				</Space>
 			),
 		},
 	];
-	
-	const data: DataType[] = [
-		{
-			key: '1',
-			name: 'John Brown',
-			age: 32,
-			dharaNo: 'New York No. 1 Lake Park',
-			tags: ['nice', 'developer'],
-		},
-		{
-			key: '2',
-			name: 'Jim Green',
-			age: 42,
-			dharaNo: 'London No. 1 Lake Park',
-			tags: ['loser'],
-		},
-		{
-			key: '3',
-			name: 'Joe Black',
-			age: 32,
-			dharaNo: 'Sydney No. 1 Lake Park',
-			tags: ['cool', 'teacher'],
-		},
-	];
 
+	// Load initial data on component mount
+	useEffect(() => {
+		setState({ customers: getAllCustomers() });
+	}, []);
+
+	// Function to show the modal for editing or adding a customer
+	const showModal = (record?: CustomerModel) => {
+		form.resetFields(); // Reset form fields
+		if (record) {
+			// If editing an existing customer, populate form fields with existing data
+			form.setFieldsValue({ dharaNo: record?.dharaNo, name: record?.name, phone: record?.phone });
+		}
+		setState({ isModalOpen: true, editData: record }); // Open modal and set data for editing
+	};
+
+	// Function to handle form submission when OK button is clicked
+	const handleOk = () => {
+		form
+			.validateFields()
+			.then((values) => {
+				console.log(values);
+				if (state.editData) {
+					// If editData is present, update existing customer
+					updateCustomer(state.editData.id, values);
+				} else {
+					// If editData is not present, create a new customer
+					createCustomer({ id: state.customers.length + 1, ...values });
+				}
+				setState({ isModalOpen: false, customers: getAllCustomers() }); // Close modal and refresh customer data
+			})
+			.catch((info: any) => {
+				console.log('Validate Failed:', info);
+			});
+	};
+
+	// Function to handle cancellation of modal
+	const handleCancel = () => {
+		setState({ isModalOpen: false }); // Close modal
+	};
+
+	// Function to handle deletion confirmation of a customer
+	const deleteConfirm = (record: CustomerModel) => {
+		deleteCustomer(record.id); // Delete customer
+		setState({ customers: getAllCustomers() }); // Refresh customer data
+	};
+
+	// JSX rendering
 	return (
 		<>
 			<Breadcrumb
@@ -101,11 +139,59 @@ export default function Customer () {
 				]}
 			/>
 			<div className="customer basic-box">
-				<Search placeholder="input search text" onSearch={onSearch} enterButton />
-				<div>
-					<Table columns={columns} dataSource={data} />
+				<div className="top-div">
+					<Search
+						size="large"
+						className="search-box"
+						placeholder="input search text"
+						onSearch={onSearch}
+						enterButton
+					/>
+					<Button size="large" onClick={(_) => showModal()} type="primary" icon={<PlusOutlined />}>
+						Add
+					</Button>
+				</div>
+				<div className="bottom-div">
+					<Table
+						columns={columns}
+						dataSource={state.customers.map((customer) => ({ ...customer, key: customer.id }))}
+					/>
 				</div>
 			</div>
+			<Modal
+				title={state.editData ? 'Edit Customer' : 'Add Customer'}
+				open={state.isModalOpen}
+				onOk={handleOk}
+				onCancel={handleCancel}>
+				<div>
+					<Form
+						form={form}
+						name="basic"
+						labelCol={{ span: 6 }}
+						wrapperCol={{ span: 16 }}
+						initialValues={{ remember: true }}
+						autoComplete="off">
+						<Form.Item
+							label="Name"
+							name="name"
+							rules={[{ required: true, message: 'Please input Name!' }]}>
+							<Input />
+						</Form.Item>
+						<Form.Item
+							label="Dhara No"
+							name="dharaNo"
+							rules={[{ required: true, message: 'Please input dhara no!' }]}>
+							<Input />
+						</Form.Item>
+						<Form.Item label="Date of Birth" name="dob">
+							<DatePicker />
+						</Form.Item>
+						<Form.Item label="Phone" name="phone">
+							<Input />
+						</Form.Item>
+					</Form>
+				</div>
+			</Modal>
 		</>
 	);
 }
