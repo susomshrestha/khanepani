@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node src/index.js",
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "heroku-postbuild": "cd frontend && NPM_CONFIG_PRODUCTION=false && npm install && npm run build"
   },
   "author": "",
   "license": "ISC",
