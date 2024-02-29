@@ -1,7 +1,7 @@
 import Customer from "../../models/customer";
-import { makeRequest } from "../util";
+// import { makeRequest } from "../util";
 
-const customerApi = '/api/customers/';
+// const customerApi = '/api/customers/';
 
 let customers: Customer[] = [
   {
