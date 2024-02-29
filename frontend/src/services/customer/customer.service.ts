@@ -1,7 +1,7 @@
 import Customer from "../../models/customer";
 import { makeRequest } from "../util";
 
-const customerApi = 'https://localhost:3000/api/customers/';
+const customerApi = '/api/customers/';
 
 let customers: Customer[] = [
   {
