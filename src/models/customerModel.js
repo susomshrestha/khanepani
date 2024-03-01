@@ -22,11 +22,12 @@ async function add(customer) {
     const { name, phone, dharaNo, dob } = customer;
     try {
         const queryResult = await pool.query(
-            'INSERT INTO customers(name, phone, dharaNo, dob) VALUES ($1, $2, $3, $4) RETURNING *;',
+            'INSERT INTO customers(name, phone, dhara_no, dob) VALUES ($1, $2, $3, $4) RETURNING *;',
             [name, phone, dharaNo, dob]
         );
         return queryResult.rows[0];
     } catch (error) {
+        console.log(error)
         throw new Error('Failed to add customer');
     }
 }
@@ -35,7 +36,7 @@ async function update(id, customer) {
     const { name, phone, dharaNo, dob } = customer;
     try {
         const queryResult = await pool.query(
-            'UPDATE customers SET name = $1, phone = $2, dharaNo = $3, dob = $4 WHERE id = $5 RETURNING *;',
+            'UPDATE customers SET name = $1, phone = $2, dhara_no = $3, dob = $4 WHERE id = $5 RETURNING *;',
             [name, phone, dharaNo, dob, id]
         );
         return queryResult.rows[0];

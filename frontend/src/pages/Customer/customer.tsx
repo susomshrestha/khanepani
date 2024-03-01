@@ -11,6 +11,7 @@ import CustomerModel from '../../models/customer';
 import { PlusOutlined } from '@ant-design/icons';
 import './customer.scss';
 import { useEffect, useReducer } from 'react';
+import { showNotification } from '../../services/notificationService';
 
 // Define the shape of the state used by the component
 interface State {
@@ -81,8 +82,17 @@ export default function Customer() {
 
 	// Load initial data on component mount
 	useEffect(() => {
-		setState({ customers: getAllCustomers() });
+		populateTable();
 	}, []);
+
+	const populateTable = async () => {
+		try {
+			const customers = await getAllCustomers();
+			setState({ customers: customers.data });
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	// Function to show the modal for editing or adding a customer
 	const showModal = (record?: CustomerModel) => {
@@ -98,16 +108,30 @@ export default function Customer() {
 	const handleOk = () => {
 		form
 			.validateFields()
-			.then((values) => {
+			.then(async (values) => {
 				console.log(values);
 				if (state.editData) {
 					// If editData is present, update existing customer
-					updateCustomer(state.editData.id, values);
+
+					try {
+						const res = await updateCustomer(state.editData.id, values);
+						setState({
+							isModalOpen: false,
+							customers: state.customers.map((item) => (item.id === res.data.id ? res.data : item)),
+						});
+						showNotification(`success`, `Success`, res.message);
+					} catch (err) {}
 				} else {
 					// If editData is not present, create a new customer
-					createCustomer({ id: state.customers.length + 1, ...values });
+					try {
+						const res = await createCustomer({ ...values });
+						setState({
+							isModalOpen: false,
+							customers: [...state.customers, res.data],
+						});
+						showNotification(`success`, `Success`, res.message);
+					} catch (err) {}
 				}
-				setState({ isModalOpen: false, customers: getAllCustomers() }); // Close modal and refresh customer data
 			})
 			.catch((info: any) => {
 				console.log('Validate Failed:', info);
@@ -120,9 +144,15 @@ export default function Customer() {
 	};
 
 	// Function to handle deletion confirmation of a customer
-	const deleteConfirm = (record: CustomerModel) => {
-		deleteCustomer(record.id); // Delete customer
-		setState({ customers: getAllCustomers() }); // Refresh customer data
+	const deleteConfirm = async (record: CustomerModel) => {
+		try {
+			const res = await deleteCustomer(record.id); // Delete customer
+			setState({
+				isModalOpen: false,
+				customers: state.customers.filter(i => i.id !== record.id),
+			});
+			showNotification(`success`, `Success`, res.message);
+		} catch (err) {}
 	};
 
 	// JSX rendering
