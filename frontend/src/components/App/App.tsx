@@ -8,16 +8,13 @@ import {
 	FileTextOutlined,
 } from '@ant-design/icons';
 import './App.scss';
-import { Layout, Menu, theme, Button } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 import { Outlet, Link } from 'react-router-dom';
 
-const { Header, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 function App() {
 	const [collapsed, setCollapsed] = useState(false);
-	const {
-		token: { colorBgContainer },
-	} = theme.useToken();
 
 	return (
 		<Layout>
@@ -26,6 +23,19 @@ function App() {
 				trigger={null}
 				collapsible
 				collapsed={collapsed}>
+				<div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+					<Button
+						type="text"
+						icon={collapsed ? <MenuUnfoldOutlined style={{fontSize: '24px'}} /> : <MenuFoldOutlined style={{fontSize: '24px'}}/>}
+						onClick={() => setCollapsed(!collapsed)}
+						style={{
+							fontSize: '24px',
+							width: 64,
+							height: 64,
+							color: 'white',
+						}}
+					/>
+				</div>
 				<div className="logo-box">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -66,18 +76,6 @@ function App() {
 				/>
 			</Sider>
 			<Layout style={collapsed ? { marginLeft: '90px' } : { marginLeft: '210px' }}>
-				<Header style={{ padding: 0, background: colorBgContainer }}>
-					<Button
-						type="text"
-						icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-						onClick={() => setCollapsed(!collapsed)}
-						style={{
-							fontSize: '16px',
-							width: 64,
-							height: 64,
-						}}
-					/>
-				</Header>
 				<Content style={{ margin: '24px 16px 24px 0', overflow: 'initial' }}>
 					<div
 						style={{
