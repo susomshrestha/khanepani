@@ -1,90 +1,49 @@
-import { Table, Space, Tag, TableProps } from 'antd';
-import Search, { SearchProps } from 'antd/es/input/Search';
-import { Breadcrumb } from 'antd';
+import { Breadcrumb, Button, Select } from 'antd';
+import { useState } from 'react';
+import { getAllCustomers } from '../../services/customer/customer.service';
+import CustomerModel from '../../models/customer';
+import './billing.scss';
+import { UserOutlined } from '@ant-design/icons';
 
 export default function Billing() {
-	const onSearch: SearchProps['onSearch'] = (value, _e, info) => console.log(info?.source, value);
+	const [searchResult, setSearchResult] = useState<CustomerModel[]>([]);
+	const [searchVal, setSearchVal] = useState<string>();
+	const [customer, setCustomer] = useState<CustomerModel>();
 
-	interface DataType {
-		key: string;
-		name: string;
-		age: number;
-		dharaNo: string;
-		tags: string[];
-	}
+	let timeout: ReturnType<typeof setTimeout> | null;
+	let currentValue: string;
 
-	const columns: TableProps<DataType>['columns'] = [
-		{
-			title: 'Name',
-			dataIndex: 'name',
-			key: 'name',
-			render: (text) => <a>{text}</a>,
-		},
-		{
-			title: 'Age',
-			dataIndex: 'age',
-			key: 'age',
-		},
-		{
-			title: 'Dhara No',
-			dataIndex: 'dharaNo',
-			key: 'dharaNo',
-		},
-		{
-			title: 'Tags',
-			key: 'tags',
-			dataIndex: 'tags',
-			render: (_, { tags }) => (
-				<>
-					{tags.map((tag) => {
-						let color = tag.length > 5 ? 'geekblue' : 'green';
-						if (tag === 'loser') {
-							color = 'volcano';
-						}
-						return (
-							<Tag color={color} key={tag}>
-								{tag.toUpperCase()}
-							</Tag>
-						);
-					})}
-				</>
-			),
-		},
-		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<Space size="middle">
-					<a>Invite {record.name}</a>
-					<a>Delete</a>
-				</Space>
-			),
-		},
-	];
+	const fetch = (value: string, callback: Function) => {
+		if (timeout) {
+			clearTimeout(timeout);
+			timeout = null;
+		}
+		currentValue = value;
 
-	const data: DataType[] = [
-		{
-			key: '1',
-			name: 'John Brown',
-			age: 32,
-			dharaNo: 'New York No. 1 Lake Park',
-			tags: ['nice', 'developer'],
-		},
-		{
-			key: '2',
-			name: 'Jim Green',
-			age: 42,
-			dharaNo: 'London No. 1 Lake Park',
-			tags: ['loser'],
-		},
-		{
-			key: '3',
-			name: 'Joe Black',
-			age: 32,
-			dharaNo: 'Sydney No. 1 Lake Park',
-			tags: ['cool', 'teacher'],
-		},
-	];
+		const getSearchData = () => {
+			getAllCustomers().then((res: any) => {
+				if (currentValue === value) {
+					callback(res.data);
+				}
+			});
+		};
+		if (value) {
+			timeout = setTimeout(getSearchData, 500);
+		} else {
+			callback([]);
+		}
+	};
+
+	const handleSearch = (newValue: string) => {
+		fetch(newValue, setSearchResult);
+	};
+
+	const handleChange = (newValue: string) => {
+		setSearchVal(newValue);
+		const cus = searchResult?.find((i) => i.dharaNo === newValue);
+		setCustomer(cus);
+		console.log(cus);
+	};
 
 	return (
 		<>
@@ -98,10 +57,109 @@ export default function Billing() {
 					},
 				]}
 			/>
-			<div className="billing basic-box">
-				<Search placeholder="input search text" onSearch={onSearch} enterButton />
+			<div className="search-box basic-box">
+				<div className="search-label">Dhara No</div>
+				<Select
+					className="search-input"
+					showSearch
+					value={searchVal}
+					placeholder={'Enter Dhara No'}
+					defaultActiveFirstOption={false}
+					suffixIcon={null}
+					filterOption={false}
+					onSearch={handleSearch}
+					onChange={handleChange}
+					notFoundContent={null}
+					options={(searchResult || []).map((d) => ({
+						value: d.dharaNo,
+						label: `${d.dharaNo} : ${d.name}`,
+					}))}
+				/>
+			</div>
+			<div className="basic-box customer-info">
+				<div className="customer-detail">
+					<div className="title-label">
+						<div className="title">Name</div>
+						<div className="label">{'Ram Sherstha'}</div>
+					</div>
+					<div className="title-label">
+						<div className="title">Dhara No</div>
+						<div className="label">{'123'}</div>
+					</div>
+					<div className="title-label">
+						<div className="title">Phone</div>
+						<div className="label">{'41234123412'}</div>
+					</div>
+				</div>
+				<div className='meter-info'>
+					<div className='last-meter'>
+						<div className="title">Last Meter Read</div>
+						<div className="label">{'120'}</div>
+					</div>
+					<div className="btn-div">
+						<button className="btn btn-green">Update Meter Reading</button>
+					</div>
+				</div>
 				<div>
-					<Table columns={columns} dataSource={data} />
+					<div className="btn-div">
+						<button className="btn btn-blue">View Bill</button>
+					</div>
+				</div>
+			</div>
+			<div className="info-box">
+				<div className="billing-info basic-box">
+					<div className="info">
+						<div>
+							<div className="title-label">
+								<div className="title">Name</div>
+								<div className="label">{'Ram Sherstha'}</div>
+							</div>
+							<div className="title-label">
+								<div className="title">From</div>
+								<div className="label">{'2024-01-01'}</div>
+							</div>
+						</div>
+						<div>
+							<div className="title-label">
+								<div className="title">Dhara No</div>
+								<div className="label">{'12'}</div>
+							</div>
+							<div className="title-label">
+								<div className="title">To</div>
+								<div className="label">{'2024-01-31'}</div>
+							</div>
+						</div>
+					</div>
+					<div className="summary">
+						<div>
+							<div>Last Read</div>
+							<div>100</div>
+						</div>
+						<div>
+							<div>Current Read</div>
+							<div>150</div>
+						</div>
+						<div>
+							<div>Price Per Meter</div>
+							<div>1.0</div>
+						</div>
+					</div>
+					<div className="bill">
+						<table>
+							<tbody>
+								<tr>
+									<th>Desc</th>
+									<th>Usage</th>
+									<th className="price">Price</th>
+								</tr>
+								<tr>
+									<td>water</td>
+									<td>50</td>
+									<td className="price">50</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</>

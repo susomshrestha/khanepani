@@ -1,6 +1,27 @@
+@import './styles/base.scss';
+
 .basic-box {
-  background: white;
-  padding: 24px;
-  margin-top: 24px;
-  border-radius: 8px;
+	background: white;
+	padding: 24px;
+	margin-top: 24px;
+	border-radius: 8px;
+}
+
+.btn {
+	color: white;
+	text-decoration: none;
+	padding: 4px 15px;
+	border-radius: 6px;
+	outline: none;
+	border: 1px solid transparent;
+	min-height: 32px;
+	cursor: pointer;
+}
+
+.btn-blue {
+	@include btn-color($color-blue);
+}
+
+.btn-green {
+	@include btn-color($color-green);
 }

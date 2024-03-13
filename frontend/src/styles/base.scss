@@ -1,0 +1,28 @@
+// font sizes
+$font-size-sm: 12px;
+$font-size-n: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 18px;
+$font-size-2xl: 20px;
+$font-size-3xl: 24px;
+$font-size-4xl: 32px;
+$font-size-5xl: 64px;
+$font-size-6xl: 80px;
+
+// colors
+$color-blue: #1677ff;
+$color-green: #52c41a;
+$color-orange: #fa8c16;
+$color-red: #f5222d;
+
+// mixin
+@mixin btn-color($bg) {
+  background: $bg;
+  &:hover {
+    background:darken($bg,8%);
+    transition: all 0.3s ease;
+  }
+  &:active {
+    background:darken($bg,25%);
+  } 
+}
