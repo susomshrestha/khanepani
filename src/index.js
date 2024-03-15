@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const pool = require('./config/dbConfig');
 const customerRouter = require("./routes/customerRoute");
+const meterRouter = require("./routes/meterRoute");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(express.json(path.join(__dirname, 'frontend/build')));
 
 //routes
 app.use("/customer", customerRouter);
+app.use("/meter", meterRouter);
 
 app.listen(3000, () => {
   console.log(`Server started at ${port}`);
