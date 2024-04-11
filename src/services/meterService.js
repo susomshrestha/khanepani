@@ -21,6 +21,18 @@ async function getMeterReadingById(id) {
     }
 }
 
+async function getMeterReadingByCustomerId(customerId) {
+    try {
+        const meter = await meterModel.getMeterReadingByCustomerId(customerId);
+        if (!meter || meter.length === 0) {
+            throw new Error('Meter not found');
+        }
+        return meter[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
 async function addMeterReading(Meter) {
     try {
         const result = await meterModel.add(Meter);
@@ -30,9 +42,9 @@ async function addMeterReading(Meter) {
     }
 }
 
-async function updateMeterReading(id, Meter) {
+async function updateMeterReading(id, meter) {
     try {
-        const result = await meterModel.update(id, Meter);
+        const result = await meterModel.update(id, meter);
         if (result && result.affectedRows === 0) {
             throw new Error('Meter not found');
         }
@@ -54,4 +66,4 @@ async function removeMeterReading(id) {
     }
 }
 
-module.exports = { getAllMeterReading, getMeterReadingById, addMeterReading, updateMeterReading, removeMeterReading };
+module.exports = { getAllMeterReading, getMeterReadingById, addMeterReading, updateMeterReading, removeMeterReading, getMeterReadingByCustomerId };

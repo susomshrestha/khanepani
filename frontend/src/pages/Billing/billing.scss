@@ -13,52 +13,60 @@
 }
 
 .customer-info {
-	display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    align-items: center;
-    justify-items: center;
-    grid-gap: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 
 	.btn-div {
 		padding: 5px;
 	}
 
-  .customer-detail {
-    .title-label {
-      .title {
-        min-width: 200px;
-      }
-    }
-  }
+	.customer-detail {
+		border-right: 1px solid black;
+		flex: 1;
+		min-height: 300px;
+		display: flex;
+		align-items: center;
+		justify-content: space-evenly;
+		flex-direction: column;
 
-  .meter-info {
-    text-align: center;
+		.title-label {
+			.title {
+				min-width: 200px;
+			}
+		}
+	}
 
-    .last-meter {
-      .title {
-        margin-top: 10px;
-        font-weight: bold;
-        font-size: $font-size-lg;
-      }
+	.meter-info {
+		text-align: center;
+		flex: 1;
+		min-height: 200px;
 
-      .label {
-        padding: 20px 10px;
-        font-size: $font-size-4xl;
-      }
-    }
-  }
+		.last-meter {
+			.title {
+				margin-top: 10px;
+				font-weight: bold;
+				font-size: $font-size-xl;
+			}
+
+			.label {
+				padding: 20px 10px;
+				font-size: $font-size-5xl;
+			}
+		}
+	}
 }
 
 .title-label {
-  display: flex;
-  padding: 4px;
-  font-size: $font-size-lg;
+	display: flex;
+	padding: 4px;
+	font-size: $font-size-lg;
 
-  .title {
-    min-width: 150px;
-    text-align: left;
-    font-weight: bold;
-  }
+	.title {
+		min-width: 150px;
+		text-align: left;
+		font-weight: bold;
+	}
 }
 
 .info-box {

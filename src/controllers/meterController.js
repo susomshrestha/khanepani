@@ -1,9 +1,10 @@
 const meterService = require('../services/meterService');
+const billingService = require('../services/billingService');
 
 async function getAll(req, res) {
 	try {
 		const customers = await meterService.getAllMeterReading();
-		res.send({ message: 'Successfully retrieved all customers', data: customers });
+		res.send({ message: 'Successfully retrieved all meter readings', data: customers });
 	} catch (error) {
 		res.status(500).send({ message: error.message });
 	}
@@ -16,18 +17,32 @@ async function getById(req, res) {
 	}
 
 	try {
-		const customer = await meterService.getMeterReadingById(id);
-		res.send({ message: 'Successfully retrieved customer by ID', data: customer });
+		const reading = await meterService.getMeterReadingById(id);
+		res.send({ message: 'Successfully retrieved meter reading by ID', data: reading });
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
+}
+
+async function getByCustomerId(req, res) {
+	const customerId = parseInt(req.params.customerId);
+	if (isNaN(customerId)) {
+		return res.status(400).send({ message: 'Invalid ID' });
+	}
+
+	try {
+		const reading = await meterService.getMeterReadingByCustomerId(customerId);
+		res.send({ message: 'Successfully retrieved meter reading by Customer ID', data: reading });
 	} catch (error) {
 		res.status(500).send({ message: error.message });
 	}
 }
 
 async function add(req, res) {
-	const customer = req.body;
+	const reading = req.body;
 	try {
-		const result = await meterService.addMeterReading(customer);
-		res.status(201).send({ message: 'Customer added successfully', data: result });
+		const result = await meterService.addMeterReading(reading);
+		res.status(201).send({ message: 'Meter reading added successfully', data: result });
 	} catch (error) {
 		res.status(500).send({ message: error.message });
 	}
@@ -39,13 +54,13 @@ async function update(req, res) {
 		return res.status(400).send({ message: 'Invalid ID' });
 	}
 
-	const customer = req.body;
+	const { meter } = req.body;
 	try {
-		const result = await meterService.updateMeterReading(id, customer);
+		const result = await meterService.updateMeterReading(id, meter);
 		if (!result) {
-			return res.status(404).send({ message: 'Customer not found' });
+			return res.status(404).send({ message: 'Meter not found' });
 		}
-		res.send({ message: 'Customer updated successfully', data: result });
+		res.send({ message: 'Meter updated successfully', data: result });
 	} catch (error) {
 		res.status(500).send({ message: error.message });
 	}
@@ -68,4 +83,24 @@ async function remove(req, res) {
 	}
 }
 
-module.exports = { getAll, getById, add, update, remove };
+async function updateAndGenerateBill(req, res) {
+	const customerId = req.params.id;
+	if (isNaN(id)) {
+		return res.status(400).send({ message: 'Invalid ID' });
+	}
+
+	const { meter } = req.body;
+
+	try {
+		// get current read
+		const prevRead = await getByCustomerId(customerId);
+
+		const currRead = await meterService.updateMeterReading(prevRead.id, meter);
+
+		await billingService.addBill({
+			prevRead: prevRead.reading, curRead: currRead.reading, customerId
+		})
+	} catch (error) {}
+}
+
+module.exports = { getAll, getById, add, update, remove, getByCustomerId, updateAndGenerateBill };

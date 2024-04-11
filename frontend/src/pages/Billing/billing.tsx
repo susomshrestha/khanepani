@@ -1,14 +1,18 @@
-import { Breadcrumb, Button, Select } from 'antd';
+import { Breadcrumb, Button, DatePicker, Form, InputNumber, Modal, Select } from 'antd';
 import { useState } from 'react';
 import { getAllCustomers } from '../../services/customer/customer.service';
 import CustomerModel from '../../models/customer';
 import './billing.scss';
 import { UserOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 export default function Billing() {
 	const [searchResult, setSearchResult] = useState<CustomerModel[]>([]);
 	const [searchVal, setSearchVal] = useState<string>();
 	const [customer, setCustomer] = useState<CustomerModel>();
+	const [isUpdateMeterModalOpen, setIsUpdateMeterModalOpen] = useState(false);
+
+	const [form] = Form.useForm();
 
 	let timeout: ReturnType<typeof setTimeout> | null;
 	let currentValue: string;
@@ -42,7 +46,19 @@ export default function Billing() {
 		setSearchVal(newValue);
 		const cus = searchResult?.find((i) => i.dharaNo === newValue);
 		setCustomer(cus);
-		console.log(cus);
+	};
+
+	const showUpdateMeterModal = () => {
+		form.resetFields();
+		setIsUpdateMeterModalOpen(true);
+	};
+
+	const handleUpdateMeterModalOk = () => {
+		setIsUpdateMeterModalOpen(false);
+	};
+
+	const handleUpdateMeterModalCancel = () => {
+		setIsUpdateMeterModalOpen(false);
 	};
 
 	return (
@@ -78,31 +94,33 @@ export default function Billing() {
 			</div>
 			<div className="basic-box customer-info">
 				<div className="customer-detail">
-					<div className="title-label">
-						<div className="title">Name</div>
-						<div className="label">{'Ram Sherstha'}</div>
+					<div className="">
+						<UserOutlined style={{ fontSize: '100px' }} />
 					</div>
-					<div className="title-label">
-						<div className="title">Dhara No</div>
-						<div className="label">{'123'}</div>
-					</div>
-					<div className="title-label">
-						<div className="title">Phone</div>
-						<div className="label">{'41234123412'}</div>
+					<div>
+						<div className="title-label">
+							<div className="title">Name</div>
+							<div className="label">{'Ram Sherstha'}</div>
+						</div>
+						<div className="title-label">
+							<div className="title">Dhara No</div>
+							<div className="label">{'123'}</div>
+						</div>
+						<div className="title-label">
+							<div className="title">Phone</div>
+							<div className="label">{'41234123412'}</div>
+						</div>
 					</div>
 				</div>
-				<div className='meter-info'>
-					<div className='last-meter'>
+				<div className="meter-info">
+					<div className="last-meter">
 						<div className="title">Last Meter Read</div>
 						<div className="label">{'120'}</div>
 					</div>
 					<div className="btn-div">
-						<button className="btn btn-green">Update Meter Reading</button>
-					</div>
-				</div>
-				<div>
-					<div className="btn-div">
-						<button className="btn btn-blue">View Bill</button>
+						<Button onClick={showUpdateMeterModal} className="btn btn-green">
+							Update Meter Reading
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -162,6 +180,28 @@ export default function Billing() {
 					</div>
 				</div>
 			</div>
+
+			<Modal
+				title="Update Meter"
+				open={isUpdateMeterModalOpen}
+				onOk={handleUpdateMeterModalOk}
+				onCancel={handleUpdateMeterModalCancel}>
+				<div>
+					<Form
+						form={form}
+						name="basic"
+						initialValues={{ remember: true }}
+						layout="vertical"
+						autoComplete="off">
+						<Form.Item label="Month" name="month">
+							<DatePicker picker="month" />
+						</Form.Item>
+						<Form.Item label="New Meter Reading" name="meter">
+							<InputNumber />
+						</Form.Item>
+					</Form>
+				</div>
+			</Modal>
 		</>
 	);
 }

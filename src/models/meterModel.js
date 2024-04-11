@@ -18,6 +18,15 @@ async function getById(id) {
     }
 }
 
+async function getByCustomerId(customerId) {
+    try {
+        const queryResult = await pool.query('SELECT * FROM meter_reading WHERE customer_id = $1;', [customerId]);
+        return queryResult.rows;
+    } catch (error) {
+        throw new Error('Failed to get meter reading by Customer ID');
+    }
+}
+
 async function add(meter) {
     const { reading, customerId } = meter;
     try {
@@ -33,11 +42,10 @@ async function add(meter) {
 }
 
 async function update(id, meter) {
-    const { reading, customerId } = meter;
     try {
         const queryResult = await pool.query(
-            'UPDATE meter_reading SET reading = $1, customer_id = $2 WHERE id = $3 RETURNING *;',
-            [reading, customerId, id]
+            'UPDATE meter_reading SET reading = $1 WHERE id = $2 RETURNING *;',
+            [meter, id]
         );
         return queryResult.rows[0];
     } catch (error) {
@@ -54,4 +62,4 @@ async function remove(id) {
     }
 }
 
-module.exports = { getAll, getById, add, update, remove };
+module.exports = { getAll, getById, add, update, remove, getByCustomerId };
