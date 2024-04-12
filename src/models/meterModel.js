@@ -23,6 +23,7 @@ async function getByCustomerId(customerId) {
         const queryResult = await pool.query('SELECT * FROM meter_reading WHERE customer_id = $1;', [customerId]);
         return queryResult.rows;
     } catch (error) {
+        console.log(error)
         throw new Error('Failed to get meter reading by Customer ID');
     }
 }

@@ -23,7 +23,7 @@ async function getMeterReadingById(id) {
 
 async function getMeterReadingByCustomerId(customerId) {
     try {
-        const meter = await meterModel.getMeterReadingByCustomerId(customerId);
+        const meter = await meterModel.getByCustomerId(customerId);
         if (!meter || meter.length === 0) {
             throw new Error('Meter not found');
         }

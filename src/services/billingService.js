@@ -59,4 +59,12 @@ async function getPreviousBillDate(customerId) {
 	}
 }
 
-module.exports = { getAllBillings, addBill, getPreviousBillDate };
+async function getLastBill(customerId) {
+	try {
+		return await billingModel.getLastBill(customerId);
+	} catch (error) {
+		throw error;
+	}
+}
+
+module.exports = { getAllBillings, addBill, getPreviousBillDate, getLastBill };

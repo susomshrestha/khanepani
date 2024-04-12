@@ -1,15 +1,20 @@
-import { Breadcrumb, Button, DatePicker, Form, InputNumber, Modal, Select } from 'antd';
+import { Breadcrumb, Button, Form, InputNumber, Modal, Select } from 'antd';
 import { useState } from 'react';
 import { getAllCustomers } from '../../services/customer/customer.service';
 import CustomerModel from '../../models/customer';
 import './billing.scss';
 import { UserOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
+import { getMeterByCustomerId } from '../../services/meter/meter.service';
+import { getLastBill } from '../../services/billing/billing.service';
+import BillModel from '../../models/bill';
+import { getDate } from '../../services/util';
 
 export default function Billing() {
 	const [searchResult, setSearchResult] = useState<CustomerModel[]>([]);
 	const [searchVal, setSearchVal] = useState<string>();
 	const [customer, setCustomer] = useState<CustomerModel>();
+	const [bill, setBill] = useState<BillModel>();
+	const [meterReading, setMeterReading] = useState(0);
 	const [isUpdateMeterModalOpen, setIsUpdateMeterModalOpen] = useState(false);
 
 	const [form] = Form.useForm();
@@ -45,7 +50,26 @@ export default function Billing() {
 	const handleChange = (newValue: string) => {
 		setSearchVal(newValue);
 		const cus = searchResult?.find((i) => i.dharaNo === newValue);
-		setCustomer(cus);
+
+		if (cus) {
+			setCustomer(cus);
+
+			getMeterByCustomerId(cus.id)
+				.then((res) => {
+					console.log(res);
+					setMeterReading(res.data.reading);
+				})
+				.catch((err) => console.log(err));
+
+			getLastBill(cus.id)
+				.then((res) => {
+					const bill = res.data as BillModel;
+					bill.billFrom = getDate(bill.billDate);
+					bill.billTo = getDate(bill.billDate, true);
+					setBill(bill);
+				})
+				.catch((err) => console.log(err));
+		}
 	};
 
 	const showUpdateMeterModal = () => {
@@ -92,94 +116,98 @@ export default function Billing() {
 					}))}
 				/>
 			</div>
-			<div className="basic-box customer-info">
-				<div className="customer-detail">
-					<div className="">
-						<UserOutlined style={{ fontSize: '100px' }} />
-					</div>
-					<div>
-						<div className="title-label">
-							<div className="title">Name</div>
-							<div className="label">{'Ram Sherstha'}</div>
+			{customer && (
+				<div className="basic-box customer-info">
+					<div className="customer-detail">
+						<div className="">
+							<UserOutlined style={{ fontSize: '100px' }} />
 						</div>
-						<div className="title-label">
-							<div className="title">Dhara No</div>
-							<div className="label">{'123'}</div>
-						</div>
-						<div className="title-label">
-							<div className="title">Phone</div>
-							<div className="label">{'41234123412'}</div>
-						</div>
-					</div>
-				</div>
-				<div className="meter-info">
-					<div className="last-meter">
-						<div className="title">Last Meter Read</div>
-						<div className="label">{'120'}</div>
-					</div>
-					<div className="btn-div">
-						<Button onClick={showUpdateMeterModal} className="btn btn-green">
-							Update Meter Reading
-						</Button>
-					</div>
-				</div>
-			</div>
-			<div className="info-box">
-				<div className="billing-info basic-box">
-					<div className="info">
 						<div>
 							<div className="title-label">
 								<div className="title">Name</div>
 								<div className="label">{'Ram Sherstha'}</div>
 							</div>
 							<div className="title-label">
-								<div className="title">From</div>
-								<div className="label">{'2024-01-01'}</div>
-							</div>
-						</div>
-						<div>
-							<div className="title-label">
 								<div className="title">Dhara No</div>
-								<div className="label">{'12'}</div>
+								<div className="label">{'123'}</div>
 							</div>
 							<div className="title-label">
-								<div className="title">To</div>
-								<div className="label">{'2024-01-31'}</div>
+								<div className="title">Phone</div>
+								<div className="label">{'41234123412'}</div>
 							</div>
 						</div>
 					</div>
-					<div className="summary">
-						<div>
-							<div>Last Read</div>
-							<div>100</div>
+					<div className="meter-info">
+						<div className="last-meter">
+							<div className="title">Last Meter Read</div>
+							<div className="label">{meterReading}</div>
 						</div>
-						<div>
-							<div>Current Read</div>
-							<div>150</div>
+						<div className="btn-div">
+							<Button onClick={showUpdateMeterModal} className="btn btn-green">
+								Update Meter Reading
+							</Button>
 						</div>
-						<div>
-							<div>Price Per Meter</div>
-							<div>1.0</div>
-						</div>
-					</div>
-					<div className="bill">
-						<table>
-							<tbody>
-								<tr>
-									<th>Desc</th>
-									<th>Usage</th>
-									<th className="price">Price</th>
-								</tr>
-								<tr>
-									<td>water</td>
-									<td>50</td>
-									<td className="price">50</td>
-								</tr>
-							</tbody>
-						</table>
 					</div>
 				</div>
-			</div>
+			)}
+			{bill && (
+				<div className="info-box">
+					<div className="billing-info basic-box">
+						<div className="info">
+							<div>
+								<div className="title-label">
+									<div className="title">Name</div>
+									<div className="label">{customer?.name}</div>
+								</div>
+								<div className="title-label">
+									<div className="title">From</div>
+									<div className="label">{bill.billFrom}</div>
+								</div>
+							</div>
+							<div>
+								<div className="title-label">
+									<div className="title">Dhara No</div>
+									<div className="label">{customer?.dharaNo}</div>
+								</div>
+								<div className="title-label">
+									<div className="title">To</div>
+									<div className="label">{bill.billTo}</div>
+								</div>
+							</div>
+						</div>
+						<div className="summary">
+							<div>
+								<div>Last Read</div>
+								<div>{bill.previousRead}</div>
+							</div>
+							<div>
+								<div>Current Read</div>
+								<div>{bill.currentRead}</div>
+							</div>
+							<div>
+								<div>Price Per Meter</div>
+								<div>1.0</div>
+							</div>
+						</div>
+						<div className="bill">
+							<table>
+								<tbody>
+									<tr>
+										<th>Desc</th>
+										<th>Usage</th>
+										<th className="price">Price</th>
+									</tr>
+									<tr>
+										<td>water</td>
+										<td>{bill.currentRead - bill.previousRead}</td>
+										<td className="price">50</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			)}
 
 			<Modal
 				title="Update Meter"
@@ -193,9 +221,6 @@ export default function Billing() {
 						initialValues={{ remember: true }}
 						layout="vertical"
 						autoComplete="off">
-						<Form.Item label="Month" name="month">
-							<DatePicker picker="month" />
-						</Form.Item>
 						<Form.Item label="New Meter Reading" name="meter">
 							<InputNumber />
 						</Form.Item>

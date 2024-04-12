@@ -4,6 +4,6 @@ const router = express.Router();
 const billingController = require('../controllers/billingController');
 
 router.get('/', billingController.getAll);
-router.get('/test', billingController.test);
+router.get('/:customerId/last-bill', billingController.getLastBill);
 
 module.exports = router;

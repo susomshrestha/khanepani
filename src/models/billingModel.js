@@ -30,10 +30,25 @@ async function getPreviousDate(customerId) {
 			'Select bill_date from bill where customer_id = $1 Order By bill_date DESC LIMIT 1;',
 			[customerId]
 		);
-		return queryResult.rows[1];
+		return queryResult.rows[0];
 	} catch (error) {
 		throw error;
 	}
 }
 
-module.exports = { getAll, add, getPreviousDate };
+async function getLastBill(customerId) {
+	console.log(customerId)
+	console.log('================')
+	try {
+		const queryResult = await pool.query(
+			'Select * from bill where customer_id = $1 Order By created_at DESC LIMIT 1',
+			[customerId]
+		);
+		return queryResult.rows[0]
+	} catch (error) {
+		console.log(error)
+		throw error;
+	}
+}
+
+module.exports = { getAll, add, getPreviousDate, getLastBill };

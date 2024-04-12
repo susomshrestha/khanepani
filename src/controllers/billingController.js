@@ -23,13 +23,17 @@ async function getById(req, res) {
 	}
 }
 
-async function test(req, res) {
-  try {
-		const billing = await billingService.addBill({customerId: 6});
+async function getLastBill(req, res) {
+	const customerId = req.params.customerId;
+	if (isNaN(customerId)) {
+		return res.status(400).send({ message: 'Customer Id required' });
+	}
+	try {
+		const billing = await billingService.getLastBill(customerId);
 		res.send({ message: 'Successfully reterived billing', data: billing });
 	} catch (error) {
 		res.status(500).send({ message: error.meessage });
 	}
 }
 
-module.exports = { getAll, getById, test };
+module.exports = { getAll, getById, getLastBill };
