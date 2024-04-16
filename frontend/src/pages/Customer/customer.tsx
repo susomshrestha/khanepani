@@ -1,4 +1,15 @@
-import { Table, Space, TableProps, Button, Modal, Form, Input, DatePicker, Popconfirm } from 'antd';
+import {
+	Table,
+	Space,
+	TableProps,
+	Button,
+	Modal,
+	Form,
+	Input,
+	DatePicker,
+	Popconfirm,
+	InputNumber,
+} from 'antd';
 import Search, { SearchProps } from 'antd/es/input/Search';
 import { Breadcrumb } from 'antd';
 import {
@@ -149,7 +160,7 @@ export default function Customer() {
 			const res = await deleteCustomer(record.id); // Delete customer
 			setState({
 				isModalOpen: false,
-				customers: state.customers.filter(i => i.id !== record.id),
+				customers: state.customers.filter((i) => i.id !== record.id),
 			});
 			showNotification(`success`, `Success`, res.message);
 		} catch (err) {}
@@ -197,7 +208,7 @@ export default function Customer() {
 					<Form
 						form={form}
 						name="basic"
-						labelCol={{ span: 6 }}
+						labelCol={{ span: 9 }}
 						wrapperCol={{ span: 16 }}
 						initialValues={{ remember: true }}
 						autoComplete="off">
@@ -219,6 +230,11 @@ export default function Customer() {
 						<Form.Item label="Phone" name="phone">
 							<Input />
 						</Form.Item>
+						{!state.editData && (
+							<Form.Item label="Initial Meter Reading" name="meter">
+								<InputNumber defaultValue={0} />
+							</Form.Item>
+						)}
 					</Form>
 				</div>
 			</Modal>
