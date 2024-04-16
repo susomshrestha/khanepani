@@ -27,15 +27,15 @@ async function getMeterReadingByCustomerId(customerId) {
         if (!meter || meter.length === 0) {
             throw new Error('Meter not found');
         }
-        return meter[0];
+        return meter;
     } catch (error) {
         throw error;
     }
 }
 
-async function addMeterReading(Meter) {
+async function addMeterReading(meter) {
     try {
-        const result = await meterModel.add(Meter);
+        const result = await meterModel.add(meter);
         return result;
     } catch (error) {
         throw error;

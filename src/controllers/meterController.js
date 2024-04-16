@@ -83,24 +83,4 @@ async function remove(req, res) {
 	}
 }
 
-async function updateAndGenerateBill(req, res) {
-	const customerId = req.params.id;
-	if (isNaN(id)) {
-		return res.status(400).send({ message: 'Invalid ID' });
-	}
-
-	const { meter } = req.body;
-
-	try {
-		// get current read
-		const prevRead = await getByCustomerId(customerId);
-
-		const currRead = await meterService.updateMeterReading(prevRead.id, meter);
-
-		await billingService.addBill({
-			prevRead: prevRead.reading, curRead: currRead.reading, customerId
-		})
-	} catch (error) {}
-}
-
-module.exports = { getAll, getById, add, update, remove, getByCustomerId, updateAndGenerateBill };
+module.exports = { getAll, getById, add, update, remove, getByCustomerId };

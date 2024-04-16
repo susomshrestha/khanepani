@@ -36,4 +36,19 @@ async function getLastBill(req, res) {
 	}
 }
 
-module.exports = { getAll, getById, getLastBill };
+async function updateMeterAndGenerateBill(req, res) {
+	const { meter, customerId } = req.body;
+
+	if (isNaN(customerId)) {
+		return res.status(400).send({ message: 'Invalid ID' });
+	}
+
+	try {
+		const bill = await billingService.updateMeterAndGenerateBill(meter, customerId);
+		res.send({ message: '', data: bill });
+	} catch (error) {
+		res.status(500).send({ message: error.message });
+	}
+}
+
+module.exports = { getAll, getById, getLastBill, updateMeterAndGenerateBill };

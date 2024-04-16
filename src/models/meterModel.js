@@ -18,10 +18,14 @@ async function getById(id) {
     }
 }
 
-async function getByCustomerId(customerId) {
+async function getByCustomerId(customerId, client = null) {
+    let cpool = pool;
+    if(client) {
+        cpool = client;
+    }
     try {
-        const queryResult = await pool.query('SELECT * FROM meter_reading WHERE customer_id = $1;', [customerId]);
-        return queryResult.rows;
+        const queryResult = await cpool.query('SELECT * FROM meter_reading WHERE customer_id = $1;', [customerId]);
+        return queryResult.rows[0];
     } catch (error) {
         console.log(error)
         throw new Error('Failed to get meter reading by Customer ID');
@@ -42,9 +46,13 @@ async function add(meter) {
     }
 }
 
-async function update(id, meter) {
+async function update(id, meter, client = null) {
+    let cpool = pool;
+    if(client) {
+        cpool = client;
+    }
     try {
-        const queryResult = await pool.query(
+        const queryResult = await cpool.query(
             'UPDATE meter_reading SET reading = $1 WHERE id = $2 RETURNING *;',
             [meter, id]
         );

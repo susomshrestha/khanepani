@@ -1,4 +1,5 @@
 const customerService = require('../services/customerService');
+const meterService = require('../services/meterService');
 
 async function getAll(req, res) {
 	try {
@@ -27,6 +28,13 @@ async function add(req, res) {
 	const customer = req.body;
 	try {
 		const result = await customerService.addCustomer(customer);
+		console.log(result);
+		if (result) {
+			await meterService.addMeterReading({
+				customerId: result.id,
+				reading: customer.meter,
+			});
+		}
 		res.status(201).send({ message: 'Customer added successfully', data: result });
 	} catch (error) {
 		res.status(500).send({ message: error.message });

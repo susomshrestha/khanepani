@@ -9,6 +9,5 @@ router.get('/customer/:customerId', meterController.getByCustomerId);
 router.post('/add', meterController.add);
 router.put('/update/:id', meterController.update);
 router.delete('/remove/:id', meterController.remove);
-router.delete('/generateBill', meterController.updateAndGenerateBill);
 
 module.exports = router;
