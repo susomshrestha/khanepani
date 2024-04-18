@@ -8,6 +8,7 @@ import {
 import Customer from './pages/Customer/customer.tsx';
 import Billing from './pages/Billing/billing.tsx';
 import Report from './pages/Report/report.tsx';
+import Payment from './pages/Payment/payment.tsx';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: "billing",
         element: <Billing />,
+      },
+      {
+        path: "payment",
+        element: <Payment />,
       },
       {
         path: "report",

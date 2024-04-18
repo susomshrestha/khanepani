@@ -1,25 +1,19 @@
-import { Breadcrumb, Button, Form, InputNumber, Modal, Select } from 'antd';
+import { Breadcrumb, Button, Select } from 'antd';
+import CustomerModel from '../../models/customer';
 import { useState } from 'react';
 import { getAllCustomers } from '../../services/customer/customer.service';
-import CustomerModel from '../../models/customer';
-import './billing.scss';
-import { getMeterByCustomerId } from '../../services/meter/meter.service';
-import { getLastBill, updateAndGenerateBill } from '../../services/billing/billing.service';
+import { getLastBill } from '../../services/billing/billing.service';
 import BillModel from '../../models/bill';
 import { getDate } from '../../services/util';
-import Bill from '../../components/Bill/bill';
-import { showNotification } from '../../services/notificationService';
 import CustomerDetail from '../../components/CustomerDetail/customerDetail';
+import Bill from '../../components/Bill/bill';
+import './payment.scss';
 
-export default function Billing() {
+export default function Payment() {
 	const [searchResult, setSearchResult] = useState<CustomerModel[]>([]);
 	const [searchVal, setSearchVal] = useState<string>();
 	const [customer, setCustomer] = useState<CustomerModel>();
 	const [bill, setBill] = useState<BillModel>();
-	const [meterReading, setMeterReading] = useState(0);
-	const [isUpdateMeterModalOpen, setIsUpdateMeterModalOpen] = useState(false);
-
-	const [form] = Form.useForm();
 
 	let timeout: ReturnType<typeof setTimeout> | null;
 	let currentValue: string;
@@ -56,12 +50,6 @@ export default function Billing() {
 		if (cus) {
 			setCustomer(cus as CustomerModel);
 
-			getMeterByCustomerId(cus.id)
-				.then((res) => {
-					setMeterReading(res.data.reading);
-				})
-				.catch((err) => console.log(err));
-
 			getLastBill(cus.id)
 				.then((res) => {
 					const bill = res.data as BillModel;
@@ -75,48 +63,15 @@ export default function Billing() {
 		}
 	};
 
-	const showUpdateMeterModal = () => {
-		form.resetFields();
-		setIsUpdateMeterModalOpen(true);
-	};
-
-	const handleUpdateMeterModalOk = async () => {
-		const reading = form.getFieldValue('meter');
-		if (!reading) {
-			// return if reading value is null
-			return;
-		}
-		if (reading < meterReading) {
-			// show error if reading is less than previous read
-			showNotification(`error`, `Error`, 'New reading must be greater than current reading.');
-			return;
-		}
-		if (customer) {
-			const response = await updateAndGenerateBill(customer.id, reading);
-			const bill = response.data as BillModel;
-			if (bill) {
-				bill.billFrom = getDate(bill.billDate);
-				bill.billTo = getDate(bill.billDate, true);
-				setBill(bill);
-				setMeterReading(bill.currentRead);
-				setIsUpdateMeterModalOpen(false);
-			}
-		}
-	};
-
-	const handleUpdateMeterModalCancel = () => {
-		setIsUpdateMeterModalOpen(false);
-	};
-
 	return (
 		<>
 			<Breadcrumb
 				items={[
 					{
-						title: 'Billing',
+						title: 'Payment',
 					},
 					{
-						title: 'Billing Info',
+						title: 'Payment Info',
 					},
 				]}
 			/>
@@ -143,14 +98,14 @@ export default function Billing() {
 				<>
 					<div className="basic-box info-box">
 						<CustomerDetail customer={customer} />
-						<div className="meter-info">
+						<div className="payment-info">
 							<div className="last-meter">
-								<div className="title">Last Meter Read</div>
-								<div className="label">{meterReading}</div>
+								<div className="title">Payment</div>
+								<div className="label">{`${bill?.totalAmount || 0}`}</div>
 							</div>
 							<div className="btn-div">
-								<Button onClick={showUpdateMeterModal} className="btn btn-green">
-									Update Meter Reading
+								<Button className="btn btn-green">
+									Mark As Paid
 								</Button>
 							</div>
 						</div>
@@ -162,25 +117,6 @@ export default function Billing() {
 					)}
 				</>
 			)}
-
-			<Modal
-				title="Update Meter"
-				open={isUpdateMeterModalOpen}
-				onOk={handleUpdateMeterModalOk}
-				onCancel={handleUpdateMeterModalCancel}>
-				<div>
-					<Form
-						form={form}
-						name="basic"
-						initialValues={{ remember: true }}
-						layout="vertical"
-						autoComplete="off">
-						<Form.Item label="New Meter Reading" name="meter">
-							<InputNumber defaultValue={meterReading} />
-						</Form.Item>
-					</Form>
-				</div>
-			</Modal>
 		</>
 	);
 }

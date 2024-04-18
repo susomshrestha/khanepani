@@ -1,0 +1,15 @@
+.customer-detail {
+  border-right: 1px solid black;
+  flex: 1;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: column;
+
+  .title-label {
+    .title {
+      min-width: 200px;
+    }
+  }
+}

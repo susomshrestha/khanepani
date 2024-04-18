@@ -33,11 +33,11 @@ async function getByCustomerId(customerId, client = null) {
 }
 
 async function add(meter) {
-    const { reading, customerId } = meter;
+    const { reading, customerId, createdAt } = meter;
     try {
         const queryResult = await pool.query(
-            'INSERT INTO meter_reading(reading, customer_id) VALUES ($1, $2) RETURNING *;',
-            [reading, customerId]
+            'INSERT INTO meter_reading(reading, customer_id, created_at) VALUES ($1, $2, $3) RETURNING *;',
+            [reading, customerId, createdAt]
         );
         return queryResult.rows[0];
     } catch (error) {

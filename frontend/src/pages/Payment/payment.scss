@@ -1,0 +1,30 @@
+@import '../../styles/base.scss';
+
+.info-box {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	.btn-div {
+		padding: 5px;
+	}
+
+	.payment-info {
+		text-align: center;
+		flex: 1;
+		min-height: 200px;
+
+		.last-meter {
+			.title {
+				margin-top: 10px;
+				font-weight: bold;
+				font-size: $font-size-xl;
+			}
+
+			.label {
+				padding: 20px 10px;
+				font-size: $font-size-5xl;
+			}
+		}
+	}
+}

@@ -12,29 +12,13 @@
 	}
 }
 
-.customer-info {
+.info-box {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 
 	.btn-div {
 		padding: 5px;
-	}
-
-	.customer-detail {
-		border-right: 1px solid black;
-		flex: 1;
-		min-height: 300px;
-		display: flex;
-		align-items: center;
-		justify-content: space-evenly;
-		flex-direction: column;
-
-		.title-label {
-			.title {
-				min-width: 200px;
-			}
-		}
 	}
 
 	.meter-info {
@@ -69,49 +53,43 @@
 	}
 }
 
-.info-box {
-	.basic-box {
-		flex: 1;
+.billing-info {
+	display: flex;
+	flex-direction: column;
+	font-size: $font-size-lg;
+
+	.info {
+		display: flex;
+		justify-content: space-between;
+		padding: 20px 10px;
+		border-bottom: 1px dashed;
 	}
 
-	.billing-info {
-		display: flex;
-		flex-direction: column;
-		font-size: $font-size-lg;
+	.summary {
+		margin-top: 10px;
+		padding: 20px 10px;
+		border-bottom: 1px dashed;
 
-		.info {
+		& > div {
+			padding: 4px;
 			display: flex;
 			justify-content: space-between;
-			padding: 20px 10px;
-			border-bottom: 1px dashed;
 		}
+	}
 
-		.summary {
-			margin-top: 10px;
-			padding: 20px 10px;
-			border-bottom: 1px dashed;
+	.bill {
+		margin-top: 20px;
+		padding: 20px 10px;
 
-			& > div {
-				padding: 4px;
-				display: flex;
-				justify-content: space-between;
+		table {
+			width: 100%;
+
+			td {
+				text-align: center;
 			}
-		}
 
-		.bill {
-			margin-top: 20px;
-			padding: 20px 10px;
-
-			table {
-				width: 100%;
-
-				td {
-					text-align: center;
-				}
-
-				.price {
-					text-align: right;
-				}
+			.price {
+				text-align: right;
 			}
 		}
 	}

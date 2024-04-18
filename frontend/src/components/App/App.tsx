@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import {
-	MoneyCollectOutlined,
 	DashboardOutlined,
 	UserOutlined,
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	FileTextOutlined,
+	BookOutlined,
+	EuroOutlined,
 } from '@ant-design/icons';
 import './App.scss';
 import { Layout, Menu, Button } from 'antd';
@@ -23,10 +24,16 @@ function App() {
 				trigger={null}
 				collapsible
 				collapsed={collapsed}>
-				<div style={{ display: 'flex', justifyContent: 'flex-end'}}>
+				<div style={{ display: 'flex', justifyContent: 'flex-end' }}>
 					<Button
 						type="text"
-						icon={collapsed ? <MenuUnfoldOutlined style={{fontSize: '24px'}} /> : <MenuFoldOutlined style={{fontSize: '24px'}}/>}
+						icon={
+							collapsed ? (
+								<MenuUnfoldOutlined style={{ fontSize: '24px' }} />
+							) : (
+								<MenuFoldOutlined style={{ fontSize: '24px' }} />
+							)
+						}
 						onClick={() => setCollapsed(!collapsed)}
 						style={{
 							fontSize: '24px',
@@ -64,11 +71,16 @@ function App() {
 						},
 						{
 							key: '3',
-							icon: <MoneyCollectOutlined />,
+							icon: <BookOutlined />,
 							label: <Link to={`billing`}>Billing</Link>,
 						},
 						{
 							key: '4',
+							icon: <EuroOutlined />,
+							label: <Link to={`payment`}>Payment</Link>,
+						},
+						{
+							key: '5',
 							icon: <FileTextOutlined />,
 							label: <Link to={`report`}>Report</Link>,
 						},

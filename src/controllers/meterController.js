@@ -1,5 +1,4 @@
 const meterService = require('../services/meterService');
-const billingService = require('../services/billingService');
 
 async function getAll(req, res) {
 	try {

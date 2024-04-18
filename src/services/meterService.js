@@ -1,3 +1,4 @@
+const NepaliDate = require('nepali-datetime');
 const meterModel = require('../models/meterModel');
 
 async function getAllMeterReading() {
@@ -35,7 +36,7 @@ async function getMeterReadingByCustomerId(customerId) {
 
 async function addMeterReading(meter) {
     try {
-        const result = await meterModel.add(meter);
+        const result = await meterModel.add({...meter, createdAt: new NepaliDate().toString()});
         return result;
     } catch (error) {
         throw error;
