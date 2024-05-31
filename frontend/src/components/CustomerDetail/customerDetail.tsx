@@ -1,5 +1,4 @@
 import { UserOutlined } from '@ant-design/icons';
-import './CustomerDetail.scss';
 import CustomerModel from '../../models/customer';
 
 export default function CustomerDetail(props: { customer: CustomerModel }) {

@@ -7,7 +7,7 @@ const meterRouter = require('./routes/meterRoute');
 const billingRouter = require('./routes/billingRoute');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5001;
 
 if (process.env.NODE_ENV === 'production') {
 	// serve static content
@@ -23,6 +23,6 @@ app.use('/customer', customerRouter);
 app.use('/meter', meterRouter);
 app.use('/billing', billingRouter);
 
-app.listen(3000, () => {
+app.listen(5001, () => {
 	console.log(`Server started at ${port}`);
 });

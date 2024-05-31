@@ -1,7 +1,7 @@
 import Customer from "../../models/customer";
 import { makeRequest } from "../util";
 
-const customerApi = 'http://localhost:3000/customer/';
+const customerApi = 'http://localhost:5001/customer/';
 
 export const getAllCustomers = () => {
   return makeRequest(customerApi);
